@@ -1,5 +1,7 @@
 // variables y selectores
 const formulario = document.querySelector('#agregar-gasto');
+const nombreInput = document.querySelector('#gasto');
+const cantidadInput = document.querySelector('#cantidad');
 
 const gastoListado = document.querySelector('#gastos tbody');
 const categoriaInput = document.querySelector('#categoria');
@@ -214,8 +216,8 @@ function resetearApp(){
 
 function actualizarBarra(){
     const gastado = presupuesto.presupuesto - presupuesto.restante;
-    const porcentaje = (gastado / presupuesto.presupuesto) * 100;
-    barraProgreso.style.width = `${porcentaje}%`;
+    const nombre = nombreInput.value;
+    const cantidad = Number(cantidadInput.value);
     barraProgreso.textContent = `${porcentaje.toFixed(0)}%`;
     barraProgreso.classList.remove('bg-success','bg-warning','bg-danger');
     if(porcentaje >= 75){
