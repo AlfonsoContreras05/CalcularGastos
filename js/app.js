@@ -1,14 +1,18 @@
 // variables y selectores
 const formulario = document.querySelector('#agregar-gasto');
 const gastoListado = document.querySelector('#gastos ul');
+const categoriaInput = document.querySelector('#categoria');
+const btnResetear = document.querySelector('#resetear');
 
 //eventos
 eventListeners();
 
 function eventListeners(){
-    document.addEventListener('DOMContentLoaded', preguntarPresupuesto );
-
-    formulario.addEventListener('submit', agregarGasto)
+    document.addEventListener('DOMContentLoaded', cargarPresupuesto );
+    formulario.addEventListener('submit', agregarGasto);
+    if(btnResetear){
+        btnResetear.addEventListener('click', resetearApp);
+    }
 };
 
 //clases
@@ -70,7 +74,7 @@ class UI{
 
         //iterar sobre gastos
         gastos.forEach( gasto => {
-            const { cantidad, nombre, id} = gasto;
+            const { cantidad, nombre, categoria, id} = gasto;
             //crear un LI listado
             const nuevoGasto = document.createElement('li');
             nuevoGasto.className = 'list-group-item d-flex justify-content-between align-items-center';
@@ -78,7 +82,7 @@ class UI{
             nuevoGasto.dataset.id = id;
 
             //agregar al html
-            nuevoGasto.innerHTML = `${nombre} <span class="badge badge-primary badge-pill">$ ${cantidad}</span>`
+            nuevoGasto.innerHTML = `${nombre} <span class="badge badge-info mr-2">${categoria}</span> <span class="badge badge-primary badge-pill">$ ${cantidad}</span>`
 
             //boton para borrar gasto
             const btnBorrar = document.createElement('button');
@@ -110,15 +114,15 @@ class UI{
         const restanteDiv = document.querySelector('.restante');
         //comprobar 25%
         if(( presupuesto / 4 ) > restante ){
-            restanteDiv.classList.remove('alert-succes', 'alert-warning');
+            restanteDiv.classList.remove('alert-success', 'alert-warning');
             restanteDiv.classList.add('alert-danger');
         //comprobar 50%
         }else if(( presupuesto / 2 ) > restante ){
-            restanteDiv.classList.remove('alert-succes');
+            restanteDiv.classList.remove('alert-success');
             restanteDiv.classList.add('alert-warning'); 
         }else{
             restanteDiv.classList.remove('alert-danger','alert-warning');
-            restanteDiv.classList.add('alert-succes'); 
+            restanteDiv.classList.add('alert-success');
         }
         //si el total es cero o menor
         if(restante <= 0 ){
@@ -134,6 +138,35 @@ let presupuesto;
 
 
 //funciones
+function cargarPresupuesto(){
+    const presupuestoLS = localStorage.getItem('presupuesto');
+    const gastosLS = localStorage.getItem('gastos');
+
+    if(presupuestoLS){
+        presupuesto = new Presupuesto(presupuestoLS);
+        presupuesto.gastos = gastosLS ? JSON.parse(gastosLS) : [];
+        presupuesto.calcularRestante();
+
+        ui.insertarPresupuesto(presupuesto);
+        ui.mostrarGastos(presupuesto.gastos);
+        ui.actualizarRestante(presupuesto.restante);
+        ui.comprobarPresupuesto(presupuesto);
+    }else{
+        preguntarPresupuesto();
+    }
+}
+
+function sincronizarStorage(){
+    localStorage.setItem('presupuesto', presupuesto.presupuesto);
+    localStorage.setItem('gastos', JSON.stringify(presupuesto.gastos));
+}
+
+function resetearApp(){
+    localStorage.removeItem('presupuesto');
+    localStorage.removeItem('gastos');
+    window.location.reload();
+}
+
 function preguntarPresupuesto(){
     const presupuestoUsuario = prompt('¿Cual es tu presupuesto?');
 
@@ -144,6 +177,7 @@ function preguntarPresupuesto(){
     presupuesto = new Presupuesto(presupuestoUsuario);
 
     ui.insertarPresupuesto(presupuesto);
+    sincronizarStorage();
 }
 
 //añade gastos
@@ -154,6 +188,7 @@ function agregarGasto(e){
     //leer los datos del formulario
     const nombre = document.querySelector('#gasto').value;
     const cantidad = Number(document.querySelector('#cantidad').value);
+    const categoria = categoriaInput.value;
 
     //validar
     if(nombre ==='' || cantidad === ''){
@@ -166,7 +201,7 @@ function agregarGasto(e){
 
     //generar un objeto gasto un object literal
     //esta sintaxis une nombre y cantidad a gasto
-    const gasto = { nombre, cantidad, id: Date.now() };
+    const gasto = { nombre, cantidad, categoria, id: Date.now() };
     //añade gasto
     presupuesto.nuevoGasto( gasto );
 
@@ -180,6 +215,7 @@ function agregarGasto(e){
     ui.actualizarRestante(restante);
 
     ui.comprobarPresupuesto(presupuesto);
+    sincronizarStorage();
 
     //reinicia el formulario
     formulario.reset();
@@ -199,5 +235,6 @@ function eliminarGasto(id){
     ui.actualizarRestante(restante);
 
     ui.comprobarPresupuesto(presupuesto);
+    sincronizarStorage();
 
 }
