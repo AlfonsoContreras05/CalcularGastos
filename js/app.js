@@ -13,10 +13,10 @@ const cantidadInput = document.querySelector('#cantidad');
 
 //eventos
 eventListeners();
-
 function eventListeners(){
     document.addEventListener('DOMContentLoaded', cargarPresupuesto );
     formulario.addEventListener('submit', agregarGasto);
+
     if(presupuestoForm){
         presupuestoForm.addEventListener('submit', definirPresupuesto);
     }
@@ -24,6 +24,10 @@ function eventListeners(){
         btnResetear.addEventListener('click', resetearApp);
     }
     // no category filter events
+
+    if(btnResetear){
+        btnResetear.addEventListener('click', resetearApp);
+    }
 };
 
 //clases
@@ -85,6 +89,7 @@ class UI{
 
         gastos.forEach( gasto => {
             const { cantidad, nombre, categoria, id} = gasto;
+
             const fila = document.createElement('tr');
             fila.classList.add('fade-in');
             fila.dataset.id = id;
@@ -97,10 +102,26 @@ class UI{
             tdCategoria.textContent = categoria;
             fila.appendChild(tdCategoria);
 
+
             const tdCantidad = document.createElement('td');
             tdCantidad.classList.add('text-right');
             tdCantidad.textContent = `$ ${cantidad}`;
             fila.appendChild(tdCantidad);
+
+            const tdCantidad = document.createElement('td');
+            tdCantidad.classList.add('text-right');
+            tdCantidad.textContent = `$ ${cantidad}`;
+            fila.appendChild(tdCantidad);
+
+            //crear un LI listado
+            const nuevoGasto = document.createElement('li');
+            nuevoGasto.className = 'list-group-item d-flex justify-content-between align-items-center';
+            //nuevoGasto.setAttribute('data-id', id);
+            nuevoGasto.dataset.id = id;
+
+            //agregar al html
+            nuevoGasto.innerHTML = `${nombre} <span class="badge badge-info mr-2">${categoria}</span> <span class="badge badge-primary badge-pill">$ ${cantidad}</span>`
+
 
             const tdAcciones = document.createElement('td');
             const btnBorrar = document.createElement('button');
@@ -162,12 +183,20 @@ function cargarPresupuesto(){
         presupuesto.calcularRestante();
 
         ui.insertarPresupuesto(presupuesto);
+
         actualizarCategorias();
         actualizarBarra();
         ui.actualizarRestante(presupuesto.restante);
         ui.comprobarPresupuesto(presupuesto);
         filtrarGastos();
         seccionPresupuesto.classList.add('d-none');
+
+
+        ui.mostrarGastos(presupuesto.gastos);
+        ui.actualizarRestante(presupuesto.restante);
+        ui.comprobarPresupuesto(presupuesto);
+
+
     }else{
         preguntarPresupuesto();
     }
@@ -183,6 +212,7 @@ function resetearApp(){
     localStorage.removeItem('gastos');
     window.location.reload();
 }
+
 
 function actualizarBarra(){
     const gastado = presupuesto.presupuesto - presupuesto.restante;
@@ -215,6 +245,7 @@ function filtrarGastos(){
     ui.mostrarGastos(presupuesto.gastos);
 }
 
+
 function preguntarPresupuesto(){
     seccionPresupuesto.classList.remove('d-none');
 }
@@ -230,19 +261,24 @@ function definirPresupuesto(e){
     presupuesto = new Presupuesto(presupuestoUsuario);
     ui.insertarPresupuesto(presupuesto);
     sincronizarStorage();
+
     actualizarBarra();
     seccionPresupuesto.classList.add('d-none');
     presupuestoForm.reset();
-}
+
+    actualizarBarra();
+    seccionPresupuesto.classList.add('d-none');
+    presupuestoForm.reset();
 
 //añade gastos
-
 function agregarGasto(e){
     e.preventDefault();
 
     //leer los datos del formulario
-    const nombre = nombreInput.value;
-    const cantidad = Number(cantidadInput.value);
+
+    const nombre = document.querySelector('#gasto').value;
+    const cantidad = Number(document.querySelector('#cantidad').value);
+
     const categoria = categoriaInput.value;
 
     //validar
@@ -272,12 +308,14 @@ function agregarGasto(e){
     ui.comprobarPresupuesto(presupuesto);
     filtrarGastos();
 
+    filtrarGastos();
+
+    sincronizarStorage();
+
     //reinicia el formulario
     formulario.reset();
 
 };
-
-
 
 function eliminarGasto(id){
     //este los elimina del objeto
@@ -291,4 +329,3 @@ function eliminarGasto(id){
     ui.comprobarPresupuesto(presupuesto);
     filtrarGastos();
 
-}
