@@ -1,6 +1,5 @@
 // variables y selectores
 const formulario = document.querySelector('#agregar-gasto');
-
 const gastoListado = document.querySelector('#gastos tbody');
 const categoriaInput = document.querySelector('#categoria');
 const categoriaDatalist = document.querySelector('#lista-categorias');
@@ -9,15 +8,11 @@ const barraProgreso = document.querySelector('#barra-progreso');
 const presupuestoForm = document.querySelector('#form-presupuesto');
 const presupuestoInput = document.querySelector('#presupuesto-input');
 const seccionPresupuesto = document.querySelector('#ingresar-presupuesto');
-
-const gastoListado = document.querySelector('#gastos ul');
-const categoriaInput = document.querySelector('#categoria');
-const btnResetear = document.querySelector('#resetear');
-
+const nombreInput = document.querySelector('#gasto');
+const cantidadInput = document.querySelector('#cantidad');
 
 //eventos
 eventListeners();
-
 function eventListeners(){
     document.addEventListener('DOMContentLoaded', cargarPresupuesto );
     formulario.addEventListener('submit', agregarGasto);
@@ -33,7 +28,6 @@ function eventListeners(){
     if(btnResetear){
         btnResetear.addEventListener('click', resetearApp);
     }
-
 };
 
 //clases
@@ -107,6 +101,12 @@ class UI{
             const tdCategoria = document.createElement('td');
             tdCategoria.textContent = categoria;
             fila.appendChild(tdCategoria);
+
+
+            const tdCantidad = document.createElement('td');
+            tdCantidad.classList.add('text-right');
+            tdCantidad.textContent = `$ ${cantidad}`;
+            fila.appendChild(tdCantidad);
 
             const tdCantidad = document.createElement('td');
             tdCantidad.classList.add('text-right');
@@ -191,9 +191,11 @@ function cargarPresupuesto(){
         filtrarGastos();
         seccionPresupuesto.classList.add('d-none');
 
+
         ui.mostrarGastos(presupuesto.gastos);
         ui.actualizarRestante(presupuesto.restante);
         ui.comprobarPresupuesto(presupuesto);
+
 
     }else{
         preguntarPresupuesto();
@@ -264,16 +266,19 @@ function definirPresupuesto(e){
     seccionPresupuesto.classList.add('d-none');
     presupuestoForm.reset();
 
-}
+    actualizarBarra();
+    seccionPresupuesto.classList.add('d-none');
+    presupuestoForm.reset();
 
 //añade gastos
-
 function agregarGasto(e){
     e.preventDefault();
 
     //leer los datos del formulario
+
     const nombre = document.querySelector('#gasto').value;
     const cantidad = Number(document.querySelector('#cantidad').value);
+
     const categoria = categoriaInput.value;
 
     //validar
@@ -301,6 +306,7 @@ function agregarGasto(e){
     actualizarBarra();
     ui.actualizarRestante(restante);
     ui.comprobarPresupuesto(presupuesto);
+    filtrarGastos();
 
     filtrarGastos();
 
@@ -321,9 +327,5 @@ function eliminarGasto(id){
     actualizarBarra();
     ui.actualizarRestante(restante);
     ui.comprobarPresupuesto(presupuesto);
-
     filtrarGastos();
 
-    sincronizarStorage();
-
-}
