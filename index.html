@@ -44,7 +44,9 @@
                     <div class="contenido secundario">
 
                         <h2 class="text-center">Listado</h2>
-
+                        <select id="filtro-categoria" class="form-control mb-3">
+                            <option value="">Todas las categorías</option>
+                        </select>
                         <div id="gastos">
                             <ul class="list-group"></ul>
                         </div>
@@ -54,6 +56,9 @@
                             </div>
                             <div class="restante alert alert-success">
                                 <p>Restante: $ <span id="restante"></span></p>
+                            </div>
+                            <div class="progress mt-2">
+                                <div id="barra-progreso" class="progress-bar" role="progressbar" style="width:0%;"></div>
                             </div>
                             <button id="resetear" class="btn btn-warning btn-block mt-3">Resetear</button>
         </div> <!--.presupuesto-->

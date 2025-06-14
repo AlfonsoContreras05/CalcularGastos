@@ -3,6 +3,8 @@ const formulario = document.querySelector('#agregar-gasto');
 const gastoListado = document.querySelector('#gastos ul');
 const categoriaInput = document.querySelector('#categoria');
 const btnResetear = document.querySelector('#resetear');
+const filtroCategoria = document.querySelector('#filtro-categoria');
+const barraProgreso = document.querySelector('#barra-progreso');
 
 //eventos
 eventListeners();
@@ -12,6 +14,9 @@ function eventListeners(){
     formulario.addEventListener('submit', agregarGasto);
     if(btnResetear){
         btnResetear.addEventListener('click', resetearApp);
+    }
+    if(filtroCategoria){
+        filtroCategoria.addEventListener('change', filtrarGastos);
     }
 };
 
@@ -77,7 +82,7 @@ class UI{
             const { cantidad, nombre, categoria, id} = gasto;
             //crear un LI listado
             const nuevoGasto = document.createElement('li');
-            nuevoGasto.className = 'list-group-item d-flex justify-content-between align-items-center';
+            nuevoGasto.className = 'list-group-item d-flex justify-content-between align-items-center fade-in';
             //nuevoGasto.setAttribute('data-id', id);
             nuevoGasto.dataset.id = id;
 
@@ -148,9 +153,11 @@ function cargarPresupuesto(){
         presupuesto.calcularRestante();
 
         ui.insertarPresupuesto(presupuesto);
-        ui.mostrarGastos(presupuesto.gastos);
+        actualizarCategorias();
+        actualizarBarra();
         ui.actualizarRestante(presupuesto.restante);
         ui.comprobarPresupuesto(presupuesto);
+        filtrarGastos();
     }else{
         preguntarPresupuesto();
     }
@@ -167,6 +174,31 @@ function resetearApp(){
     window.location.reload();
 }
 
+function actualizarBarra(){
+    const gastado = presupuesto.presupuesto - presupuesto.restante;
+    const porcentaje = (gastado / presupuesto.presupuesto) * 100;
+    barraProgreso.style.width = `${porcentaje}%`;
+    barraProgreso.textContent = `${porcentaje.toFixed(0)}%`;
+}
+
+function actualizarCategorias(){
+    if(!filtroCategoria) return;
+    const categorias = [...new Set(presupuesto.gastos.map(g => g.categoria).filter(Boolean))];
+    filtroCategoria.innerHTML = '<option value="">Todas las categorías</option>';
+    categorias.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        filtroCategoria.appendChild(option);
+    });
+}
+
+function filtrarGastos(){
+    const categoria = filtroCategoria ? filtroCategoria.value : '';
+    const gastosMostrar = categoria ? presupuesto.gastos.filter(g => g.categoria === categoria) : presupuesto.gastos;
+    ui.mostrarGastos(gastosMostrar);
+}
+
 function preguntarPresupuesto(){
     const presupuestoUsuario = prompt('¿Cual es tu presupuesto?');
 
@@ -178,6 +210,7 @@ function preguntarPresupuesto(){
 
     ui.insertarPresupuesto(presupuesto);
     sincronizarStorage();
+    actualizarBarra();
 }
 
 //añade gastos
@@ -208,14 +241,14 @@ function agregarGasto(e){
     //mensaje de correcto
     ui.imprimirAlerta('Gasto agregado correctamente');
 
-    //imprimir los gastos
+
     const { gastos, restante } = presupuesto;
-    ui.mostrarGastos(gastos);
-
-    ui.actualizarRestante(restante);
-
-    ui.comprobarPresupuesto(presupuesto);
     sincronizarStorage();
+    actualizarCategorias();
+    actualizarBarra();
+    ui.actualizarRestante(restante);
+    ui.comprobarPresupuesto(presupuesto);
+    filtrarGastos();
 
     //reinicia el formulario
     formulario.reset();
@@ -228,13 +261,12 @@ function eliminarGasto(id){
     //este los elimina del objeto
     presupuesto.eliminarGasto(id);
 
-    //elimina los gastos del html
     const { gastos, restante } = presupuesto;
-    ui.mostrarGastos(gastos);
-
-    ui.actualizarRestante(restante);
-
-    ui.comprobarPresupuesto(presupuesto);
     sincronizarStorage();
+    actualizarCategorias();
+    actualizarBarra();
+    ui.actualizarRestante(restante);
+    ui.comprobarPresupuesto(presupuesto);
+    filtrarGastos();
 
 }
