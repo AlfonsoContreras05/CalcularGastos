@@ -13,6 +13,7 @@ header {
     background-color: white;
     padding: 30px;
     border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 .presupuesto p{
     margin-bottom: 0;
@@ -39,4 +40,51 @@ h2 {
 
 #resetear{
     font-weight: bold;
+
 }
+
+.table tbody tr.fade-in {
+    animation: fadeIn 0.5s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+.table td:last-child {
+    width:1%;
+    white-space: nowrap;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#barra-progreso {
+    transition: width 0.4s ease;
+    font-weight: bold;
+}
+
+.progress {
+    height: 1.5rem;
+}
+
+#ingresar-presupuesto input {
+    max-width: 200px;
+    margin-right: 5px;
+}
+
+
+
