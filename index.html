@@ -40,8 +40,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="categoria">Categoría:</label>
+
                                     <input list="lista-categorias" type="text" class="form-control" id="categoria" placeholder="Ej. Transporte">
                                     <datalist id="lista-categorias"></datalist>
+
+                                    <input type="text" class="form-control" id="categoria" placeholder="Ej. Transporte"></input>
+
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Agregar</button>
@@ -74,9 +78,11 @@
                             <div class="restante alert alert-success">
                                 <p>Restante: $ <span id="restante"></span></p>
                             </div>
+
                             <div class="progress mt-2">
                                 <div id="barra-progreso" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0%;"></div>
                             </div>
+
                             <button id="resetear" class="btn btn-warning btn-block mt-3">Resetear</button>
         </div> <!--.presupuesto-->
                     </div> <!--.contenido-->
